@@ -1,0 +1,69 @@
+#!/bin/bash
+
+CURRENT_ID_FILE="/tmp/current_sway_focused_id"
+OLD_ID_FILE="/tmp/old_sway_focused_id"
+
+# Function to get the current focused window ID
+get_current_id() {
+    swaymsg -t get_tree | jq '.. | select(.type?) | select(.focused==true).id' | tr -d '"'
+}
+
+# Function to save the current ID with checks
+save_current_id() {
+    current_id=$(get_current_id)
+    echo "Current ID: $current_id"
+    if [ -f "$CURRENT_ID_FILE" ]; then
+        previous_id=$(cat "$CURRENT_ID_FILE")
+        echo "Previous ID: $previous_id"
+        if [ "$current_id" == "$previous_id" ]; then
+            echo "IDs are the same, aborting."
+            exit 0
+        else
+            echo "IDs are different, saving previous ID to OLD_ID_FILE."
+            echo "$previous_id" > "$OLD_ID_FILE"
+        fi
+    fi
+    echo "Saving current ID to CURRENT_ID_FILE."
+    echo "$current_id" > "$CURRENT_ID_FILE"
+}
+
+# Function to switch to the last focused ID
+switch_to_last_id() {
+    if [ -f "$OLD_ID_FILE" ]; then
+        last_old_id=$(cat "$OLD_ID_FILE")
+        last_current_id=$(cat "$CURRENT_ID_FILE")
+        current_id=$(get_current_id)
+        echo "Current ID: $current_id"
+        echo "Last current ID: $last_current_id"
+        echo "Last old ID: $last_old_id"
+
+        if [ "$current_id" == "$last_current_id" ]; then
+            swaymsg "[con_id=$last_old_id] focus"
+            echo "Switched focus to last old ID: $last_old_id"
+            echo "$last_old_id" > "$CURRENT_ID_FILE"
+        else
+            swaymsg "[con_id=$last_current_id] focus"
+            echo "Switched focus to last current ID: $last_current_id"
+            echo "$last_current_id" > "$CURRENT_ID_FILE"
+        fi
+
+        echo "Saving current ID to OLD_ID_FILE."
+        echo "$current_id" > "$OLD_ID_FILE"
+    else
+        echo "No previous ID file found." >&2
+    fi
+}
+
+# Main script logic
+case "$1" in
+    "save")
+        save_current_id
+        ;;
+    "switch")
+        switch_to_last_id
+        ;;
+    *)
+        echo "Usage: $0 {save|switch}"
+        exit 1
+        ;;
+esac
