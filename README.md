@@ -1,19 +1,26 @@
 # sway-alt-tab
-Alt-tab functionalty. It switches between two containers. You select the container you would like to be able to switch to with Alt-Tab by holding down Alt and navigating to it. Only release the Alt key when you've found your desired container. The only exception is that you can use Alt-Tab directly without releasing the Tab and the second container ID will still be saved. 
 
-# Setup
+This script adds `Alt-Tab` functionality to Sway, allowing you to switch between two containers. Here's how it works:
 
-## 1. Sway Config
+- **Select Containers:** Hold down `Alt` and navigate to the container you want to switch to. 
+- **Switching:** Release `Alt` when you've selected your desired container. 
+- **Direct Use:** You can also use `Alt-Tab` directly without releasing `Tab`, and the script will remember the second container ID for switching.
 
-Add the following to your sway config file:
-```
+## Setup
+
+### 1. Sway Config
+
+Add the following lines to your Sway configuration file (`~/.config/sway/config`):
+
+```text
 # For alt-tab functionality
-bindsym --no-repeat Alt_R exec exec /script_location/alt-tab save
-bindsym --no-repeat Alt_L exec exec /script_location/alt-tab save
-bindsym --no-repeat $mod+Tab exec /script_location/alt-tab switch
+bindsym --no-repeat Alt_R exec /path/to/script/alt-tab save
+bindsym --no-repeat Alt_L exec /path/to/script/alt-tab save
+bindsym --no-repeat $mod+Tab exec /path/to/script/alt-tab switch
 ```
-For my system using `Mod1` directly doesn't work for this purpose. That's why I use Alt_R and Alt_L instead.
-Change `script_location` to wherever you saved the script.
 
-## 2. Download Script
-Download the scrip and make it executable. 
+## 2. Download and Setup Script
+
+- **Download:** Download Script.
+- **Make Executable:** Change the script's permissions to make it executable:
+ `chmod +x /path/to/script/alt-tab`
